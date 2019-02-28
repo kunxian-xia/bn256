@@ -152,6 +152,40 @@ func (e *G1) Unmarshal(m []byte) (*G1, bool) {
 	return e, true
 }
 
+// Decompress sets e to the result of decompressing the CompressedG1 back into
+// a group element and then returns e.
+func (e *G1) Decompress(m []byte) (*G1, bool) {
+	const numBytes = 256 / 8
+	lsb := m[0]
+
+	if len(m) != 1+numBytes {
+		return nil, false
+	}
+
+	if lsb>>1 != 0 {
+		return nil, false
+	}
+
+	x := new(big.Int).SetBytes(m[1 : 1+numBytes])
+	x2 := new(big.Int).Mul(x, x)
+	x2.Mod(x2, P) // x2 = x^2 (mod P)
+	x3 := new(big.Int).Mul(x2, x)
+	x3.Mod(x3, P) // x3 = x^3 (mod P)
+	y2 := new(big.Int).Add(x3, curveB)
+	y2.Mod(y2, P)
+	y := new(big.Int).ModSqrt(y2, P)
+
+	if byte(y.Bit(0)) != lsb {
+		y.Sub(P, y)
+	}
+
+	bytes := make([]byte, 64)
+	copy(bytes[:numBytes], x.Bytes())
+	copy(bytes[numBytes:2*numBytes], y.Bytes())
+
+	return e.Unmarshal(bytes)
+}
+
 // G2 is an abstract cyclic group. The zero value is suitable for use as the
 // output of an operation, but cannot be used as an input.
 type G2 struct {
@@ -274,6 +308,26 @@ func (e *G2) Unmarshal(m []byte) (*G2, bool) {
 
 	return e, true
 }
+
+/*
+func (e *G2) Decompress(m []byte) (*G2, bool) {
+	const numBytes = 256 / 8
+
+	if len(m) != 1+2*numBytes {
+		return nil, false
+	}
+
+	pool := new(bnPool)
+
+	x := new(gfP2)
+	x.x.SetBytes(m[1 : numBytes+1])
+	x.y.SetBytes(m[numBytes+1 : 2*numBytes+1])
+
+	x2 := new(gfP2).Mul(x, x, pool)
+	x3 := new(gfP2).Mul(x2, x, pool)
+	y2 := new(gfP2).Add(x3, twistB)
+}
+*/
 
 // GT is an abstract cyclic group. The zero value is suitable for use as the
 // output of an operation, but cannot be used as an input.
