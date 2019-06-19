@@ -18,7 +18,6 @@ import (
 	"errors"
 	"io"
 	"math/big"
-	"github.com/pkg/errors"
 )
 
 func randomK(r io.Reader) (k *big.Int, err error) {
@@ -163,9 +162,9 @@ func (e *G1) MarshalJSON() ([]byte, error) {
 }
 
 func (e *G1) UnmarshalJSON(data []byte) error {
-	_, ok := e.Unmarshal(data)
-	if !ok {
-		return errors.New("cannot unmarshal to G1")
+	_, err := e.Unmarshal(data)
+	if err != nil {
+		return err
 	}
 	return nil
 }
@@ -350,9 +349,9 @@ func (e *G2) MarshalJSON() ([]byte, error) {
 }
 
 func (e *G2) UnmarshalJSON(data []byte) error {
-	_, ok := e.Unmarshal(data)
-	if !ok {
-		return errors.New("cannot unmarshal to G1")
+	_, err := e.Unmarshal(data)
+	if err != nil {
+		return err
 	}
 	return nil
 }
