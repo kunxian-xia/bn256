@@ -20,6 +20,7 @@ import (
 	"crypto/rand"
 	"io"
 	"math/big"
+	"github.com/pkg/errors"
 )
 
 // BUG(agl): this implementation is not constant time.
@@ -150,6 +151,18 @@ func (e *G1) Unmarshal(m []byte) (*G1, bool) {
 	}
 
 	return e, true
+}
+
+func (e *G1) MarshalJSON() ([]byte, error) {
+	return e.Marshal(), nil
+}
+
+func (e *G1) UnmarshalJSON(data []byte) error {
+	_, ok := e.Unmarshal(data)
+	if !ok {
+		return errors.New("cannot unmarshal to G1")
+	}
+	return nil
 }
 
 // Decompress sets e to the result of decompressing the CompressedG1 back into
@@ -309,25 +322,17 @@ func (e *G2) Unmarshal(m []byte) (*G2, bool) {
 	return e, true
 }
 
-/*
-func (e *G2) Decompress(m []byte) (*G2, bool) {
-	const numBytes = 256 / 8
-
-	if len(m) != 1+2*numBytes {
-		return nil, false
-	}
-
-	pool := new(bnPool)
-
-	x := new(gfP2)
-	x.x.SetBytes(m[1 : numBytes+1])
-	x.y.SetBytes(m[numBytes+1 : 2*numBytes+1])
-
-	x2 := new(gfP2).Mul(x, x, pool)
-	x3 := new(gfP2).Mul(x2, x, pool)
-	y2 := new(gfP2).Add(x3, twistB)
+func (e *G2) MarshalJSON() ([]byte, error) {
+	return e.Marshal(), nil
 }
-*/
+
+func (e *G2) UnmarshalJSON(data []byte) error {
+	_, ok := e.Unmarshal(data)
+	if !ok {
+		return errors.New("cannot unmarshal to G1")
+	}
+	return nil
+}
 
 // GT is an abstract cyclic group. The zero value is suitable for use as the
 // output of an operation, but cannot be used as an input.
