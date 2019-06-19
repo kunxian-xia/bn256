@@ -188,7 +188,7 @@ func (e *G1) Decompress(m []byte) (*G1, bool) {
 	x2.Mod(x2, P) // x2 = x^2 (mod P)
 	x3 := new(big.Int).Mul(x2, x)
 	x3.Mod(x3, P) // x3 = x^3 (mod P)
-	y2 := new(big.Int).Add(x3, curveB)
+	y2 := new(big.Int).Add(x3, big.NewInt(3))
 	y2.Mod(y2, P)
 	y := new(big.Int).ModSqrt(y2, P)
 
@@ -200,7 +200,8 @@ func (e *G1) Decompress(m []byte) (*G1, bool) {
 	copy(bytes[:numBytes], x.Bytes())
 	copy(bytes[numBytes:2*numBytes], y.Bytes())
 
-	return e.Unmarshal(bytes)
+	e.Unmarshal(bytes)
+	return e, true
 }
 
 // G2 is an abstract cyclic group. The zero value is suitable for use as the
