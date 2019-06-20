@@ -15,6 +15,7 @@ package bn256
 
 import (
 	"crypto/rand"
+	"encoding/hex"
 	"errors"
 	"io"
 	"math/big"
@@ -158,11 +159,15 @@ func (e *G1) Unmarshal(m []byte) ([]byte, error) {
 }
 
 func (e *G1) MarshalJSON() ([]byte, error) {
-	return e.Marshal(), nil
+	return []byte(hex.EncodeToString(e.Marshal())), nil
 }
 
 func (e *G1) UnmarshalJSON(data []byte) error {
-	_, err := e.Unmarshal(data)
+	bytes, err := hex.DecodeString(string(data))
+	if err != nil {
+		return err
+	}
+	_, err = e.Unmarshal(bytes)
 	if err != nil {
 		return err
 	}
@@ -346,11 +351,15 @@ func (e *G2) Unmarshal(m []byte) ([]byte, error) {
 }
 
 func (e *G2) MarshalJSON() ([]byte, error) {
-	return e.Marshal(), nil
+	return []byte(hex.EncodeToString(e.Marshal())), nil
 }
 
 func (e *G2) UnmarshalJSON(data []byte) error {
-	_, err := e.Unmarshal(data)
+	bytes, err := hex.DecodeString(string(data))
+	if err != nil {
+		return err
+	}
+	_, err = e.Unmarshal(bytes)
 	if err != nil {
 		return err
 	}

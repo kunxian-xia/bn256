@@ -6,6 +6,44 @@ import (
 	"testing"
 )
 
+func TestG1Json(t *testing.T) {
+	_, Ga, err := RandomG1(rand.Reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	data, err := Ga.MarshalJSON()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var a G1
+	err = a.UnmarshalJSON(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if Ga.String() != a.String() {
+		t.Fatal("Ga != a: marshal/unmarshal json failed")
+	}
+}
+
+func TestG2Json(t *testing.T) {
+	_, Ga, err := RandomG2(rand.Reader)
+	if err != nil {
+		t.Fatal(err)
+	}
+	data, err := Ga.MarshalJSON()
+	if err != nil {
+		t.Fatal(err)
+	}
+	var a G2
+	err = a.UnmarshalJSON(data)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if Ga.String() != a.String() {
+		t.Fatal("Ga != a: marshal/unmarshal json failed")
+	}
+}
+
 func TestG1Marshal(t *testing.T) {
 	_, Ga, err := RandomG1(rand.Reader)
 	if err != nil {
